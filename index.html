@@ -8,7 +8,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#0f1115">
+    <meta name="theme-color" content="#6b4226">
     <link rel="apple-touch-icon" href="/static/logo.png">
     <link rel="icon" type="image/png" href="/static/logo.png">
 
@@ -20,8 +20,10 @@
 
 <div class="container">
 
-    <h1>🏀 Basketball Team Generator V2</h1>
-    <p class="court-subtitle">Rank &middot; Pair &middot; Split</p>
+    <div class="court-header">
+        <h1>🏀 Basketball Team Generator V2</h1>
+        <p class="court-subtitle">Rank &middot; Pair &middot; Split</p>
+    </div>
 
     <div class="tabs">
 
@@ -372,97 +374,99 @@
 
 
 
-        <div class="teams">
+        <div class="tipoff-wrap">
 
-            <div class="vs-badge" aria-hidden="true">VS</div>
+            <div class="center-circle" aria-hidden="true"><span>VS</span></div>
 
+            <div class="teams">
 
+                <div class="team">
 
-            <div class="team">
+                    <h3>
 
-                <h3>
+                        Team A
 
-                    Team A
-
-                </h3>
-
-
-
-                <ul
-
-                id="teamA"
-
-                >
-
-                </ul>
+                    </h3>
 
 
 
-                <div class="score hidden">
+                    <ul
 
-                    Total Score:
-
-                    <span
-
-                    id="scoreA"
+                    id="teamA"
 
                     >
 
-                        0
+                    </ul>
 
-                    </span>
+
+
+                    <div class="score hidden">
+
+                        Total Score:
+
+                        <span
+
+                        id="scoreA"
+
+                        >
+
+                            0
+
+                        </span>
+
+                    </div>
+
+
+
+                </div>
+
+
+
+
+
+                <div class="team">
+
+                    <h3>
+
+                        Team B
+
+                    </h3>
+
+
+
+                    <ul
+
+                    id="teamB"
+
+                    >
+
+                    </ul>
+
+
+
+                    <div class="score hidden">
+
+                        Total Score:
+
+                        <span
+
+                        id="scoreB"
+
+                        >
+
+                            0
+
+                        </span>
+
+                    </div>
+
+
 
                 </div>
 
 
 
             </div>
-
-
-
-
-
-            <div class="team">
-
-                <h3>
-
-                    Team B
-
-                </h3>
-
-
-
-                <ul
-
-                id="teamB"
-
-                >
-
-                </ul>
-
-
-
-                <div class="score hidden">
-
-                    Total Score:
-
-                    <span
-
-                    id="scoreB"
-
-                    >
-
-                        0
-
-                    </span>
-
-                </div>
-
-
-
-            </div>
-
-
 
         </div>
 
