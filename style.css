@@ -1,0 +1,493 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 30px;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f3f4f6;
+    color: #222;
+}
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+h2 {
+    margin-top: 0;
+}
+
+h3 {
+    margin-top: 0;
+}
+
+.desc {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+/* Tabs */
+
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.tab {
+
+    padding: 12px 22px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #ddd;
+
+    cursor: pointer;
+
+    font-size: 16px;
+
+    transition: .2s;
+}
+
+.tab:hover {
+
+    transform: translateY(-2px);
+
+}
+
+.tab.active {
+
+    background: #2563eb;
+
+    color: white;
+
+}
+
+
+/* Stage */
+
+.stage {
+
+    background: white;
+
+    border-radius: 18px;
+
+    padding: 28px;
+
+    box-shadow:
+
+    0 4px 20px rgba(0,0,0,.08);
+
+}
+
+.hidden {
+
+    display: none;
+
+}
+
+
+/* Inputs */
+
+.input-row,
+
+.preset-row {
+
+    display: flex;
+
+    gap: 10px;
+
+    margin-bottom: 20px;
+
+}
+
+input,
+
+select {
+
+    flex: 1;
+
+    padding: 12px;
+
+    border-radius: 10px;
+
+    border: 1px solid #ccc;
+
+    font-size: 15px;
+
+}
+
+select {
+
+    width: 100%;
+
+}
+
+
+/* Buttons */
+
+button {
+
+    border: none;
+
+    padding: 12px 18px;
+
+    border-radius: 10px;
+
+    background: #2563eb;
+
+    color: white;
+
+    cursor: pointer;
+
+    font-size: 15px;
+
+    transition: .2s;
+
+}
+
+button:hover {
+
+    opacity: .9;
+
+    transform: translateY(-1px);
+
+}
+
+button.primary {
+
+    background: #16a34a;
+
+}
+
+button.danger {
+
+    background: #dc2626;
+
+}
+
+.buttons {
+
+    display: flex;
+
+    gap: 10px;
+
+    flex-wrap: wrap;
+
+    margin-top: 20px;
+
+}
+
+.buttons.right {
+
+    justify-content: flex-end;
+
+}
+
+
+/* Player list */
+
+.player-list {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+}
+
+.player {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    padding: 15px;
+
+    background: white;
+
+    border: 1px solid #ddd;
+
+    border-radius: 12px;
+
+    cursor: move;
+
+}
+
+.player:hover {
+
+    background: #fafafa;
+
+}
+
+.player-rank {
+
+    width: 40px;
+
+    font-weight: bold;
+
+    font-size: 18px;
+
+}
+
+.player-name {
+
+    flex: 1;
+
+    font-size: 16px;
+
+}
+
+.player-remove {
+
+    background: #dc2626;
+
+}
+
+.player-remove:hover {
+
+    background: #b91c1c;
+
+}
+
+
+/* Checkbox row */
+
+.checkbox-row {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 15px;
+
+}
+
+
+/* Pair area */
+
+.pair-container {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 20px;
+
+    margin-top: 25px;
+
+}
+
+.pair {
+
+    width: 240px;
+
+    min-height: 170px;
+
+    background: #f9fafb;
+
+    border: 2px solid #ddd;
+
+    border-radius: 15px;
+
+    padding: 15px;
+
+}
+
+.pair-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 15px;
+
+}
+
+.pair-header h3 {
+
+    margin: 0;
+
+}
+
+.delete-pair {
+
+    background: #dc2626;
+
+    padding: 6px 10px;
+
+}
+
+.pair-list {
+
+    min-height: 80px;
+
+}
+
+.pair-player {
+
+    padding: 12px;
+
+    border-radius: 10px;
+
+    background: white;
+
+    border: 1px solid #ccc;
+
+    margin-bottom: 10px;
+
+    cursor: move;
+
+}
+
+.unpaired {
+
+    border-style: dashed;
+
+}
+
+
+/* Teams */
+
+.teams {
+
+    display: flex;
+
+    gap: 25px;
+
+    margin-top: 25px;
+
+}
+
+.team {
+
+    flex: 1;
+
+    background: #f9fafb;
+
+    border-radius: 15px;
+
+    border: 1px solid #ddd;
+
+    padding: 20px;
+
+}
+
+.team h3 {
+
+    text-align: center;
+
+}
+
+.team ul {
+
+    list-style: none;
+
+    padding: 0;
+
+}
+
+.team li {
+
+    padding: 12px;
+
+    margin-bottom: 10px;
+
+    background: white;
+
+    border-radius: 10px;
+
+    border: 1px solid #ddd;
+
+}
+
+.score {
+
+    text-align: center;
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+    margin-top: 20px;
+
+}
+
+
+/* SortableJS */
+
+.sortable-ghost {
+
+    opacity: 0.35;
+
+}
+
+.sortable-chosen {
+
+    transform: scale(1.03);
+
+}
+
+
+/* Divider */
+
+hr {
+
+    margin-top: 30px;
+
+    margin-bottom: 30px;
+
+    border: none;
+
+    border-top: 1px solid #eee;
+
+}
+
+
+/* Mobile */
+
+@media (max-width: 800px) {
+
+    .teams {
+
+        flex-direction: column;
+
+    }
+
+    .pair-container {
+
+        flex-direction: column;
+
+    }
+
+    .pair {
+
+        width: 100%;
+
+    }
+
+    .input-row,
+
+    .preset-row {
+
+        flex-direction: column;
+
+    }
+
+}

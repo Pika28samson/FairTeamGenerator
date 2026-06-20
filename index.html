@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basketball Team Generator V2</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏀</text></svg>">
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+
+    <h1>🏀 Basketball Team Generator V2</h1>
+
+    <div class="tabs">
+
+        <button class="tab active"
+                onclick="showStage(1)">
+            Stage 1
+        </button>
+
+        <button class="tab"
+                onclick="showStage(2)">
+            Stage 2
+        </button>
+
+        <button class="tab"
+                onclick="showStage(3)">
+            Stage 3
+        </button>
+
+    </div>
+
+
+
+    <!-- STAGE 1 -->
+
+    <div id="stage1" class="stage">
+
+        <h2>
+            Player Ranking
+        </h2>
+
+        <p class="desc">
+
+            Drag players to rank them.
+
+            Tick who is playing today.
+
+        </p>
+
+
+
+        <div class="input-row">
+
+            <input
+
+                id="playerInput"
+
+                type="text"
+
+                placeholder="Player name"
+
+                onkeydown="if(event.key==='Enter') addPlayer()"
+
+            >
+
+            <button onclick="addPlayer()">
+
+                Add
+
+            </button>
+
+        </div>
+
+
+
+        <div id="playerList"
+
+             class="player-list">
+
+        </div>
+
+
+
+        <div class="buttons">
+
+            <button onclick="selectAll(true)">
+
+                Select All
+
+            </button>
+
+            <button onclick="selectAll(false)">
+
+                Deselect All
+
+            </button>
+
+        </div>
+
+
+
+
+        <hr>
+
+
+
+        <h3>
+
+            Presets
+
+        </h3>
+
+
+        <div class="preset-row">
+
+            <input
+
+                    id="presetName"
+
+                    placeholder="Preset Name"
+
+            >
+
+            <button
+
+                onclick="savePreset()"
+
+            >
+
+                Save
+
+            </button>
+
+        </div>
+
+
+
+        <select
+
+            id="presetSelect"
+
+        >
+
+        </select>
+
+
+
+        <div class="buttons">
+
+            <button
+
+            onclick="loadPreset()"
+
+            >
+
+                Load
+
+            </button>
+
+
+            <button
+
+            class="danger"
+
+            onclick="deletePreset()"
+
+            >
+
+                Delete
+
+            </button>
+
+        </div>
+
+
+
+
+        <div class="buttons right">
+
+            <button
+
+            class="primary"
+
+            onclick="goStage2()"
+
+            >
+
+                Next →
+
+            </button>
+
+        </div>
+
+
+    </div>
+
+
+
+
+
+    <!-- STAGE 2 -->
+
+
+    <div
+
+    id="stage2"
+
+    class="stage hidden"
+
+    >
+
+        <h2>
+
+            Matching Pairs
+
+        </h2>
+
+
+
+        <label class="checkbox-row">
+
+            <input
+
+            type="checkbox"
+
+            id="usePairs"
+
+            checked
+
+            onchange="togglePairs()"
+
+            >
+
+            Use Matching Pairs
+
+        </label>
+
+
+
+        <p class="desc">
+
+            Drag players between pairs.
+
+            Players in the same pair will always be separated.
+
+        </p>
+
+
+
+        <div class="buttons">
+
+            <button
+
+            onclick="autoGeneratePairs()"
+
+            >
+
+                Auto Generate
+
+            </button>
+
+
+            <button
+
+            onclick="addEmptyPair()"
+
+            >
+
+                Add Pair
+
+            </button>
+
+        </div>
+
+
+
+        <div id="pairContainer" class="pair-container"></div>
+
+        <div class="pair unpaired-box">
+
+            <div class="pair-header">
+
+                <h3>Unpaired</h3>
+
+            </div>
+
+            <div
+
+                id="unpaired"
+
+                class="pair-list"
+
+            >
+
+            </div>
+
+        </div>
+
+
+
+
+        <div class="buttons">
+
+            <button
+
+            onclick="showStage(1)"
+
+            >
+
+                ← Back
+
+            </button>
+
+
+            <button
+
+            class="primary"
+
+            onclick="generateTeams()"
+
+            >
+
+                Generate Teams →
+
+            </button>
+
+        </div>
+
+
+
+    </div>
+
+
+
+
+
+    <!-- STAGE 3 -->
+
+
+
+    <div
+
+    id="stage3"
+
+    class="stage hidden"
+
+    >
+
+        <h2>
+
+            Generated Teams
+
+        </h2>
+
+
+
+        <div class="teams">
+
+
+
+            <div class="team">
+
+                <h3>
+
+                    Team A
+
+                </h3>
+
+
+
+                <ul
+
+                id="teamA"
+
+                >
+
+                </ul>
+
+
+
+                <div class="score">
+
+                    Total Score:
+
+                    <span
+
+                    id="scoreA"
+
+                    >
+
+                        0
+
+                    </span>
+
+                </div>
+
+
+
+            </div>
+
+
+
+
+
+            <div class="team">
+
+                <h3>
+
+                    Team B
+
+                </h3>
+
+
+
+                <ul
+
+                id="teamB"
+
+                >
+
+                </ul>
+
+
+
+                <div class="score">
+
+                    Total Score:
+
+                    <span
+
+                    id="scoreB"
+
+                    >
+
+                        0
+
+                    </span>
+
+                </div>
+
+
+
+            </div>
+
+
+
+        </div>
+
+
+
+
+        <div class="buttons">
+
+            <button
+
+            onclick="generateTeams()"
+
+            >
+
+                🔄 Generate Again
+
+            </button>
+
+
+            <button
+
+            onclick="showStage(2)"
+
+            >
+
+                ← Back
+
+            </button>
+
+        </div>
+
+
+    </div>
+
+
+
+</div>
+
+
+
+<script src="script.js"></script>
+
+</body>
+</html>
