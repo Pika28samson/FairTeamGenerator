@@ -1,0 +1,15 @@
+{
+  "name": "Basketball Team Generator",
+  "short_name": "TeamGen",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f3f4f6",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "https://fairbasketballteamsgenerator.onrender.com/static/logo.png",
+      "sizes": "626x626",
+      "type": "image/png"
+    }
+  ]
+}

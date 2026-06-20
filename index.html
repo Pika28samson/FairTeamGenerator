@@ -1,513 +1,209 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Basketball Team Generator V2</title>
-
-    <link rel="manifest" href="manifest.json">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#6b4226">
-    <link rel="apple-touch-icon" href="/static/logo.png">
-    <link rel="icon" type="image/png" href="/static/logo.png">
-
-    <link rel="stylesheet" href="style.css">
-
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Fair Teams — Basketball Team Balancer</title>
+<link rel="manifest" href="/static/manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="/static/logo.png">
+<link rel="icon" type="image/png" href="/static/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="container">
+<div class="court-bg" aria-hidden="true">
+  <svg class="court-lines" viewBox="0 0 400 900" preserveAspectRatio="xMidYMid slice">
+    <circle cx="200" cy="120" r="90" />
+    <circle cx="200" cy="120" r="4" />
+    <line x1="40" y1="0" x2="40" y2="900" />
+    <line x1="360" y1="0" x2="360" y2="900" />
+    <path d="M 60 0 Q 200 260 60 480" />
+    <path d="M 340 0 Q 200 260 340 480" />
+  </svg>
+</div>
 
-    <div class="court-header">
-        <h1>🏀 Basketball Team Generator V2</h1>
-        <p class="court-subtitle">Rank &middot; Pair &middot; Split</p>
+<div class="app" id="app">
+
+  <!-- HEADER / SCOREBOARD -->
+  <header class="scoreboard">
+    <div class="scoreboard-glow"></div>
+    <div class="brand">
+      <span class="brand-mark">FAIR</span><span class="brand-mark accent">TEAMS</span>
     </div>
+    <button class="presets-fab" id="presetsFab" aria-label="Open presets">
+      <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+    </button>
+    <nav class="stage-tracker" id="stageTracker">
+      <button class="stage-dot" data-stage="1"><span class="dot-num">1</span><span class="dot-label">Roster</span></button>
+      <div class="stage-rail"><div class="stage-rail-fill" id="railFill"></div></div>
+      <button class="stage-dot" data-stage="2"><span class="dot-num">2</span><span class="dot-label">Pairs</span></button>
+      <div class="stage-rail"><div class="stage-rail-fill" id="railFill2"></div></div>
+      <button class="stage-dot" data-stage="3"><span class="dot-num">3</span><span class="dot-label">Teams</span></button>
+    </nav>
+  </header>
 
-    <div class="tabs">
+  <main class="stages" id="stages">
 
-        <button class="tab active"
-                onclick="showStage(1)">
-            Stage 1
+    <!-- ================= STAGE 1: ROSTER ================= -->
+    <section class="stage" id="stage1" data-stage="1">
+      <div class="stage-head">
+        <h1>Build your roster</h1>
+        <p class="sub">Add every player, then drag to rank them best to worst.</p>
+      </div>
+
+      <form id="addPlayerForm" class="add-player-form" autocomplete="off">
+        <input type="text" id="playerNameInput" placeholder="Player name" maxlength="24" required>
+        <button type="submit" class="btn-add" aria-label="Add player">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
         </button>
+      </form>
 
-        <button class="tab"
-                onclick="showStage(2)">
-            Stage 2
+      <div class="list-toolbar">
+        <span class="list-count" id="playerCount">0 players</span>
+        <div class="toolbar-actions">
+          <button class="link-btn" id="savePresetFromRosterBtn" type="button">Save as preset</button>
+          <button class="link-btn link-btn-danger" id="clearAllBtn" type="button">Clear all</button>
+        </div>
+      </div>
+
+      <ul class="player-list" id="playerList"></ul>
+
+      <p class="empty-hint" id="emptyHint">No players yet. Add your first one above — every name you add joins the bottom of the rankings.</p>
+
+      <div class="stage-foot">
+        <div class="playing-count" id="playingCount">0 of 0 selected to play</div>
+        <button class="btn-primary" id="toStage2Btn" disabled>
+          Pick matchups <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
         </button>
+      </div>
+    </section>
 
-        <button class="tab"
-                onclick="showStage(3)">
-            Stage 3
+    <!-- ================= STAGE 2: PAIRS ================= -->
+    <section class="stage" id="stage2" data-stage="2">
+      <div class="stage-head">
+        <h1>Set the matchups</h1>
+        <p class="sub">Players paired together will land on <em>opposite</em> teams — that's what keeps things fair.</p>
+      </div>
+
+      <div class="pair-toggle-row">
+        <div class="toggle-text">
+          <span class="toggle-title">Skill pairing</span>
+          <span class="toggle-desc" id="toggleDesc">Pairs are matched by rank</span>
+        </div>
+        <button class="switch" id="pairingToggle" role="switch" aria-checked="true">
+          <span class="switch-knob"></span>
         </button>
+      </div>
 
+      <div class="pair-list" id="pairList"></div>
+
+      <div class="leftover-zone" id="leftoverZone" style="display:none;">
+        <div class="leftover-label">Sitting out the matchups</div>
+        <div class="leftover-row" id="leftoverRow"></div>
+      </div>
+
+      <div class="stage-foot two-buttons">
+        <button class="btn-ghost" id="backTo1Btn" type="button">
+          <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg> Back
+        </button>
+        <button class="btn-primary" id="toStage3Btn">
+          Generate teams <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- ================= STAGE 3: TEAMS ================= -->
+    <section class="stage" id="stage3" data-stage="3">
+      <div class="stage-head reveal-head">
+        <h1 id="revealTitle">Your teams are set</h1>
+        <p class="sub">Not feeling it? Reshuffle as many times as you want.</p>
+      </div>
+
+      <div class="teams-wrap" id="teamsWrap">
+        <div class="team-col" id="teamA">
+          <div class="team-banner team-banner-a">
+            <span class="team-name">Team Orange</span>
+            <span class="team-tally" id="teamATally">0</span>
+          </div>
+          <ul class="team-roster" id="teamARoster"></ul>
+        </div>
+        <div class="vs-seam" aria-hidden="true">
+          <span>VS</span>
+        </div>
+        <div class="team-col" id="teamB">
+          <div class="team-banner team-banner-b">
+            <span class="team-name">Team Blue</span>
+            <span class="team-tally" id="teamBTally">0</span>
+          </div>
+          <ul class="team-roster" id="teamBRoster"></ul>
+        </div>
+      </div>
+
+      <div class="stage-foot stack">
+        <button class="btn-primary btn-shuffle" id="shuffleBtn" type="button">
+          <svg viewBox="0 0 24 24"><path d="M4 4h4l8 16h4M4 20h4l3-6M16 4h4"/></svg>
+          Shuffle again
+        </button>
+        <div class="row-buttons">
+          <button class="btn-ghost" id="backTo2Btn" type="button">
+            <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg> Edit pairs
+          </button>
+          <button class="btn-ghost" id="savePresetBtn" type="button">
+            <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+            Save preset
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- PRESET DRAWER (accessible from header) -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <div class="presets-drawer" id="presetsDrawer">
+    <div class="drawer-handle"></div>
+    <div class="drawer-head">
+      <h2>Presets</h2>
+      <button class="icon-btn" id="closeDrawerBtn" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
     </div>
-
-
-
-    <!-- STAGE 1 -->
-
-    <div id="stage1" class="stage">
-
-        <h2>
-            <span class="stage-tag">01</span>
-            Player Ranking
-        </h2>
-
-        <p class="desc">
-
-            Drag players to rank them.
-
-            Tick who is playing today.
-
-        </p>
-
-
-
-        <div class="input-row">
-
-            <input
-
-                id="playerInput"
-
-                type="text"
-
-                placeholder="Player name"
-
-                onkeydown="if(event.key==='Enter') addPlayer()"
-
-            >
-
-            <button onclick="addPlayer()">
-
-                Add
-
-            </button>
-
-        </div>
-
-
-
-        <div id="playerList"
-
-             class="player-list">
-
-        </div>
-
-
-
-        <div class="buttons">
-
-            <button onclick="selectAll(true)">
-
-                Select All
-
-            </button>
-
-            <button onclick="selectAll(false)">
-
-                Deselect All
-
-            </button>
-
-        </div>
-
-
-
-
-        <hr>
-
-
-
-        <h3>
-
-            Presets
-
-        </h3>
-
-
-        <div class="preset-row">
-
-            <input
-
-                    id="presetName"
-
-                    placeholder="Preset Name"
-
-            >
-
-            <button
-
-                onclick="savePreset()"
-
-            >
-
-                Save
-
-            </button>
-
-        </div>
-
-
-
-        <select
-
-            id="presetSelect"
-
-        >
-
-        </select>
-
-
-
-        <div class="buttons">
-
-            <button
-
-            onclick="loadPreset()"
-
-            >
-
-                Load
-
-            </button>
-
-
-            <button
-
-            class="danger"
-
-            onclick="deletePreset()"
-
-            >
-
-                Delete
-
-            </button>
-
-        </div>
-
-
-
-
-        <div class="buttons right">
-
-            <button
-
-            class="primary"
-
-            onclick="goStage2()"
-
-            >
-
-                Next →
-
-            </button>
-
-        </div>
-
-
-    </div>
-
-
-
-
-
-    <!-- STAGE 2 -->
-
-
-    <div
-
-    id="stage2"
-
-    class="stage hidden"
-
-    >
-
-        <h2>
-
-            <span class="stage-tag">02</span>
-
-            Matching Pairs
-
-        </h2>
-
-
-
-        <label class="checkbox-row">
-
-            <input
-
-            type="checkbox"
-
-            id="usePairs"
-
-            checked
-
-            onchange="togglePairs()"
-
-            >
-
-            Use Matching Pairs
-
-        </label>
-
-
-
-        <p class="desc">
-
-            Drag players between pairs.
-
-            Players in the same pair will always be separated.
-
-        </p>
-
-
-
-        <div class="buttons">
-
-            <button
-
-            onclick="autoGeneratePairs()"
-
-            >
-
-                Auto Generate
-
-            </button>
-
-
-            <button
-
-            onclick="addEmptyPair()"
-
-            >
-
-                Add Pair
-
-            </button>
-
-        </div>
-
-
-
-        <div id="pairContainer" class="pair-container"></div>
-
-        <div class="pair unpaired-box">
-
-            <div class="pair-header">
-
-                <h3>Unpaired</h3>
-
-            </div>
-
-            <div
-
-                id="unpaired"
-
-                class="pair-list"
-
-            >
-
-            </div>
-
-        </div>
-
-
-
-
-        <div class="buttons">
-
-            <button
-
-            onclick="showStage(1)"
-
-            >
-
-                ← Back
-
-            </button>
-
-
-            <button
-
-            class="primary"
-
-            onclick="generateTeams()"
-
-            >
-
-                Generate Teams →
-
-            </button>
-
-        </div>
-
-
-
-    </div>
-
-
-
-
-
-    <!-- STAGE 3 -->
-
-
-
-    <div
-
-    id="stage3"
-
-    class="stage hidden"
-
-    >
-
-        <h2>
-
-            <span class="stage-tag">03</span>
-
-            Generated Teams
-
-        </h2>
-
-
-
-        <div class="tipoff-wrap">
-
-            <div class="center-circle" aria-hidden="true"><span>VS</span></div>
-
-            <div class="teams">
-
-                <div class="team">
-
-                    <h3>
-
-                        Team A
-
-                    </h3>
-
-
-
-                    <ul
-
-                    id="teamA"
-
-                    >
-
-                    </ul>
-
-
-
-                    <div class="score hidden">
-
-                        Total Score:
-
-                        <span
-
-                        id="scoreA"
-
-                        >
-
-                            0
-
-                        </span>
-
-                    </div>
-
-
-
-                </div>
-
-
-
-
-
-                <div class="team">
-
-                    <h3>
-
-                        Team B
-
-                    </h3>
-
-
-
-                    <ul
-
-                    id="teamB"
-
-                    >
-
-                    </ul>
-
-
-
-                    <div class="score hidden">
-
-                        Total Score:
-
-                        <span
-
-                        id="scoreB"
-
-                        >
-
-                            0
-
-                        </span>
-
-                    </div>
-
-
-
-                </div>
-
-
-
-            </div>
-
-        </div>
-
-
-
-
-        <div class="buttons">
-
-            <button
-
-            onclick="generateTeams()"
-
-            >
-
-                🔄 Generate Again
-
-            </button>
-
-
-            <button
-
-            onclick="showStage(2)"
-
-            >
-
-                ← Back
-
-            </button>
-
-        </div>
-
-
-    </div>
-
-
+    <p class="drawer-sub">Save your roster, rankings, who's playing, and pairing settings so next game night is one tap away.</p>
+    <div class="preset-list" id="presetList"></div>
+    <p class="preset-empty" id="presetEmpty">No presets saved yet.</p>
+  </div>
 
 </div>
 
+<!-- ===== MODALS ===== -->
+<div class="modal-overlay" id="saveModalOverlay">
+  <div class="modal-card">
+    <h2>Save preset</h2>
+    <p class="modal-sub">This saves your full roster, rankings, who's playing, and pairing mode.</p>
+    <input type="text" id="presetNameInput" placeholder="e.g. Tuesday night run" maxlength="30">
+    <div class="modal-buttons">
+      <button class="btn-ghost" id="cancelSaveBtn" type="button">Cancel</button>
+      <button class="btn-primary" id="confirmSaveBtn" type="button">Save</button>
+    </div>
+  </div>
+</div>
 
+<div class="modal-overlay" id="confirmModalOverlay">
+  <div class="modal-card">
+    <h2 id="confirmModalTitle">Are you sure?</h2>
+    <p class="modal-sub" id="confirmModalSub"></p>
+    <div class="modal-buttons">
+      <button class="btn-ghost" id="confirmModalCancel" type="button">Cancel</button>
+      <button class="btn-danger" id="confirmModalOk" type="button">Confirm</button>
+    </div>
+  </div>
+</div>
 
-<script src="script.js"></script>
+<div class="toast" id="toast"></div>
 
+<script src="app.js"></script>
 </body>
 </html>
