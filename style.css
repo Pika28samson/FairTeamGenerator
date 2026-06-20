@@ -1,493 +1,652 @@
+/* ============================================
+   COURTSIDE — Basketball Team Generator
+   Design tokens
+   ============================================ */
+:root {
+    --ink: #0f1115;
+    --ink-soft: #171a21;
+    --panel: #ffffff;
+    --panel-dim: #f4f5f7;
+    --line: #e3e5ea;
+
+    --orange: #ff6b35;
+    --orange-dark: #e0501f;
+    --court-blue: #1e3a5f;
+    --court-blue-light: #2c5183;
+    --jersey-red: #c81e3a;
+    --jersey-red-light: #df2f4c;
+    --amber: #f5c518;
+
+    --text: #1a1d23;
+    --text-dim: #6b7280;
+    --text-on-dark: #f4f5f7;
+
+    --radius-lg: 20px;
+    --radius-md: 14px;
+    --radius-sm: 8px;
+
+    --shadow-card: 0 10px 30px -12px rgba(15, 17, 21, 0.18);
+    --shadow-pop: 0 16px 40px -10px rgba(15, 17, 21, 0.28);
+
+    --font-display: "Arial Black", Arial, sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: "Courier New", Courier, monospace;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
 * {
     box-sizing: border-box;
 }
 
 body {
     margin: 0;
-    padding: 30px;
-    font-family: Arial, Helvetica, sans-serif;
-    background: #f3f4f6;
-    color: #222;
+    padding: 28px 18px 60px;
+    font-family: var(--font-body);
+    color: var(--text);
+    background-color: var(--ink);
+    background-image:
+        radial-gradient(circle at 18% 8%, rgba(255, 107, 53, 0.18), transparent 40%),
+        radial-gradient(circle at 85% 0%, rgba(30, 58, 95, 0.35), transparent 45%),
+        repeating-linear-gradient(
+            -35deg,
+            rgba(255, 255, 255, 0.02) 0px,
+            rgba(255, 255, 255, 0.02) 2px,
+            transparent 2px,
+            transparent 26px
+        );
+    min-height: 100vh;
 }
 
 .container {
-    max-width: 1100px;
+    max-width: 1080px;
     margin: auto;
 }
 
+/* ============================================
+   HEADER / SCOREBOARD MARQUEE
+   ============================================ */
 h1 {
     text-align: center;
-    margin-bottom: 25px;
+    margin: 0 0 6px;
+    font-family: var(--font-display);
+    font-size: clamp(26px, 5vw, 42px);
+    letter-spacing: 0.5px;
+    color: var(--text-on-dark);
+    text-shadow: 0 2px 0 rgba(0,0,0,0.4);
+}
+
+.court-subtitle {
+    text-align: center;
+    color: rgba(244, 245, 247, 0.55);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 26px;
 }
 
 h2 {
     margin-top: 0;
+    font-family: var(--font-display);
+    font-size: 22px;
+    letter-spacing: 0.3px;
+    color: var(--ink);
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+}
+
+h2 .stage-tag {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--panel);
+    background: var(--orange);
+    padding: 4px 9px;
+    border-radius: 6px;
+    transform: translateY(-1px);
 }
 
 h3 {
     margin-top: 0;
+    font-family: var(--font-display);
+    letter-spacing: 0.2px;
 }
 
 .desc {
-    color: #666;
-    margin-bottom: 20px;
+    color: var(--text-dim);
+    margin-bottom: 22px;
+    font-size: 14.5px;
+    line-height: 1.5;
 }
 
-/* Tabs */
-
+/* ============================================
+   TABS — scoreboard "PERIOD" selector
+   ============================================ */
 .tabs {
     display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 8px;
+    margin-bottom: 18px;
+    background: rgba(255, 255, 255, 0.06);
+    padding: 6px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .tab {
-
-    padding: 12px 22px;
-
+    flex: 1;
+    padding: 13px 10px;
     border: none;
-
-    border-radius: 10px;
-
-    background: #ddd;
-
+    border-radius: 11px;
+    background: transparent;
+    color: rgba(244, 245, 247, 0.5);
     cursor: pointer;
-
-    font-size: 16px;
-
-    transition: .2s;
+    font-family: var(--font-display);
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    transition: 0.18s ease;
 }
 
 .tab:hover {
-
-    transform: translateY(-2px);
-
+    color: var(--text-on-dark);
+    background: rgba(255, 255, 255, 0.06);
+    transform: none;
 }
 
 .tab.active {
-
-    background: #2563eb;
-
-    color: white;
-
+    background: var(--orange);
+    color: #fff;
+    box-shadow: 0 6px 16px -4px rgba(255, 107, 53, 0.6);
 }
 
-
-/* Stage */
-
+/* ============================================
+   STAGE PANELS
+   ============================================ */
 .stage {
+    background: var(--panel);
+    border-radius: var(--radius-lg);
+    padding: 30px;
+    box-shadow: var(--shadow-card);
+    animation: stage-in 0.32s ease both;
+}
 
-    background: white;
-
-    border-radius: 18px;
-
-    padding: 28px;
-
-    box-shadow:
-
-    0 4px 20px rgba(0,0,0,.08);
-
+@keyframes stage-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .hidden {
-
     display: none;
-
 }
 
-
-/* Inputs */
-
+/* ============================================
+   INPUTS
+   ============================================ */
 .input-row,
-
 .preset-row {
-
     display: flex;
-
     gap: 10px;
-
     margin-bottom: 20px;
-
 }
 
 input,
-
 select {
-
     flex: 1;
-
-    padding: 12px;
-
-    border-radius: 10px;
-
-    border: 1px solid #ccc;
-
+    padding: 13px 14px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--line);
     font-size: 15px;
+    font-family: var(--font-body);
+    background: var(--panel-dim);
+    color: var(--text);
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
 
+input::placeholder {
+    color: #9aa0aa;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: var(--orange);
+    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.18);
+    background: var(--panel);
 }
 
 select {
-
     width: 100%;
-
+    cursor: pointer;
 }
 
-
-/* Buttons */
-
+/* ============================================
+   BUTTONS
+   ============================================ */
 button {
-
     border: none;
-
-    padding: 12px 18px;
-
-    border-radius: 10px;
-
-    background: #2563eb;
-
-    color: white;
-
+    padding: 13px 20px;
+    border-radius: var(--radius-sm);
+    background: var(--ink);
+    color: #fff;
     cursor: pointer;
-
-    font-size: 15px;
-
-    transition: .2s;
-
+    font-size: 14.5px;
+    font-weight: 600;
+    font-family: var(--font-body);
+    transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
 }
 
 button:hover {
+    opacity: 0.92;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px -6px rgba(15, 17, 21, 0.35);
+}
 
-    opacity: .9;
+button:active {
+    transform: translateY(0);
+}
 
-    transform: translateY(-1px);
-
+button:focus-visible {
+    outline: 3px solid var(--amber);
+    outline-offset: 2px;
 }
 
 button.primary {
+    background: var(--orange);
+}
 
-    background: #16a34a;
-
+button.primary:hover {
+    box-shadow: 0 8px 18px -6px rgba(255, 107, 53, 0.55);
 }
 
 button.danger {
+    background: var(--jersey-red);
+}
 
-    background: #dc2626;
-
+button.danger:hover {
+    box-shadow: 0 8px 18px -6px rgba(200, 30, 58, 0.5);
 }
 
 .buttons {
-
     display: flex;
-
     gap: 10px;
-
     flex-wrap: wrap;
-
     margin-top: 20px;
-
 }
 
 .buttons.right {
-
     justify-content: flex-end;
-
 }
 
-
-/* Player list */
-
+/* ============================================
+   PLAYER LIST (Stage 1) — draft board rows
+   ============================================ */
 .player-list {
-
     display: flex;
-
     flex-direction: column;
-
     gap: 10px;
-
 }
 
 .player {
-
     display: flex;
-
     align-items: center;
-
-    gap: 15px;
-
-    padding: 15px;
-
-    background: white;
-
-    border: 1px solid #ddd;
-
-    border-radius: 12px;
-
-    cursor: move;
-
+    gap: 16px;
+    padding: 14px 16px;
+    background: var(--panel-dim);
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-md);
+    cursor: grab;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    position: relative;
 }
 
 .player:hover {
+    border-color: #d6d9de;
+    box-shadow: 0 4px 14px -6px rgba(15, 17, 21, 0.12);
+}
 
-    background: #fafafa;
-
+.player::before {
+    content: "⠿";
+    color: #c2c6cc;
+    font-size: 15px;
+    letter-spacing: -2px;
 }
 
 .player-rank {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 15px;
+    color: #fff;
+    background: var(--court-blue);
+    border-radius: 9px;
+}
 
-    width: 40px;
-
-    font-weight: bold;
-
-    font-size: 18px;
-
+.player input[type="checkbox"] {
+    flex: 0 0 auto;
+    width: 20px;
+    height: 20px;
+    accent-color: var(--orange);
+    cursor: pointer;
 }
 
 .player-name {
-
     flex: 1;
-
-    font-size: 16px;
-
+    font-size: 15.5px;
+    font-weight: 600;
 }
 
 .player-remove {
-
-    background: #dc2626;
-
+    background: transparent;
+    color: var(--jersey-red);
+    padding: 8px 11px;
+    font-size: 13px;
+    font-weight: 700;
 }
 
 .player-remove:hover {
-
-    background: #b91c1c;
-
+    background: rgba(200, 30, 58, 0.1);
+    box-shadow: none;
+    transform: none;
 }
-
 
 /* Checkbox row */
-
 .checkbox-row {
-
     display: flex;
-
     align-items: center;
-
     gap: 10px;
-
-    margin-bottom: 15px;
-
+    margin-bottom: 16px;
+    font-weight: 600;
+    font-size: 14.5px;
 }
 
+.checkbox-row input[type="checkbox"] {
+    width: 19px;
+    height: 19px;
+    accent-color: var(--orange);
+    cursor: pointer;
+}
 
-/* Pair area */
-
+/* ============================================
+   PAIR AREA (Stage 2) — matchup cards
+   ============================================ */
 .pair-container {
-
     display: flex;
-
     flex-wrap: wrap;
-
-    gap: 20px;
-
-    margin-top: 25px;
-
+    gap: 16px;
+    margin-top: 22px;
 }
 
 .pair {
-
-    width: 240px;
-
-    min-height: 170px;
-
-    background: #f9fafb;
-
-    border: 2px solid #ddd;
-
-    border-radius: 15px;
-
-    padding: 15px;
-
+    width: 230px;
+    min-height: 160px;
+    background: var(--panel-dim);
+    border: 2px solid var(--line);
+    border-radius: var(--radius-md);
+    padding: 14px;
+    transition: border-color 0.15s;
 }
 
 .pair-header {
-
     display: flex;
-
     justify-content: space-between;
-
     align-items: center;
-
-    margin-bottom: 15px;
-
+    margin-bottom: 12px;
 }
 
 .pair-header h3 {
-
     margin: 0;
+    font-size: 14px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+}
 
+.pair-header button {
+    background: transparent;
+    color: var(--jersey-red);
+    padding: 4px 9px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.pair-header button:hover {
+    background: rgba(200, 30, 58, 0.1);
+    box-shadow: none;
+    transform: none;
 }
 
 .delete-pair {
-
-    background: #dc2626;
-
+    background: var(--jersey-red);
     padding: 6px 10px;
-
 }
 
 .pair-list {
-
-    min-height: 80px;
-
+    min-height: 76px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .pair-player {
-
-    padding: 12px;
-
-    border-radius: 10px;
-
-    background: white;
-
-    border: 1px solid #ccc;
-
-    margin-bottom: 10px;
-
-    cursor: move;
-
+    padding: 11px 13px;
+    border-radius: var(--radius-sm);
+    background: var(--panel);
+    border: 1.5px solid var(--line);
+    cursor: grab;
+    font-size: 14.5px;
+    font-weight: 600;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.02);
 }
 
-.unpaired {
-
+.unpaired-box {
+    margin-top: 18px;
     border-style: dashed;
-
+    background: var(--panel-dim);
 }
 
+.unpaired-box .pair-header h3::before {
+    content: "↺ ";
+}
 
-/* Teams */
-
+/* ============================================
+   TEAMS (Stage 3) — split scoreboard
+   ============================================ */
 .teams {
-
     display: flex;
+    gap: 0;
+    margin-top: 24px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+    position: relative;
+}
 
-    gap: 25px;
+.teams::after {
+    content: "VS";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--font-display);
+    font-size: 18px;
+    color: #fff;
+    background: var(--ink);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 5px var(--panel), 0 6px 16px -4px rgba(0,0,0,0.4);
+    z-index: 2;
+    letter-spacing: 0.5px;
+}
 
-    margin-top: 25px;
-
+@media (max-width: 800px) {
+    .teams::after {
+        top: 0;
+        transform: translate(-50%, -50%);
+    }
 }
 
 .team {
-
     flex: 1;
+    background: var(--panel);
+    padding: 24px 20px 26px;
+    position: relative;
+}
 
-    background: #f9fafb;
+.team:first-of-type {
+    background: linear-gradient(180deg, rgba(30, 58, 95, 0.07), transparent 120px);
+    border-right: 1px solid var(--line);
+}
 
-    border-radius: 15px;
-
-    border: 1px solid #ddd;
-
-    padding: 20px;
-
+.team:last-of-type {
+    background: linear-gradient(180deg, rgba(200, 30, 58, 0.07), transparent 120px);
 }
 
 .team h3 {
-
     text-align: center;
-
+    font-size: 17px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
 }
 
+.team:first-of-type h3 {
+    color: var(--court-blue);
+}
+
+.team:last-of-type h3 {
+    color: var(--jersey-red);
+}
+
+.team:first-of-type h3::before { content: "🔵 "; font-size: 12px; }
+.team:last-of-type h3::before { content: "🔴 "; font-size: 12px; }
+
 .team ul {
-
     list-style: none;
-
     padding: 0;
-
+    margin: 0;
 }
 
 .team li {
+    padding: 12px 14px;
+    margin-bottom: 9px;
+    background: var(--panel-dim);
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--line);
+    font-weight: 600;
+    font-size: 14.5px;
+    animation: roster-in 0.3s ease both;
+}
 
-    padding: 12px;
+.team li:nth-child(n) {
+    animation-delay: calc(0.04s * var(--i, 0));
+}
 
-    margin-bottom: 10px;
+@keyframes roster-in {
+    from { opacity: 0; transform: translateX(-6px); }
+    to { opacity: 1; transform: translateX(0); }
+}
 
-    background: white;
+.team:last-of-type li {
+    animation-name: roster-in-right;
+}
 
-    border-radius: 10px;
-
-    border: 1px solid #ddd;
-
+@keyframes roster-in-right {
+    from { opacity: 0; transform: translateX(6px); }
+    to { opacity: 1; transform: translateX(0); }
 }
 
 .score {
-
     text-align: center;
-
-    font-size: 18px;
-
-    font-weight: bold;
-
-    margin-top: 20px;
-
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 18px;
 }
 
+.score span {
+    display: inline-block;
+    min-width: 30px;
+    font-family: var(--font-display);
+    font-size: 20px;
+    color: var(--ink);
+    background: var(--amber);
+    border-radius: 6px;
+    padding: 2px 8px;
+    margin-left: 6px;
+}
 
-/* SortableJS */
-
+/* ============================================
+   SortableJS states
+   ============================================ */
 .sortable-ghost {
-
     opacity: 0.35;
-
 }
 
 .sortable-chosen {
-
     transform: scale(1.03);
-
+    box-shadow: var(--shadow-pop) !important;
 }
 
-
-/* Divider */
-
+/* ============================================
+   Divider
+   ============================================ */
 hr {
-
-    margin-top: 30px;
-
-    margin-bottom: 30px;
-
+    margin: 30px 0;
     border: none;
-
-    border-top: 1px solid #eee;
-
+    border-top: 1px dashed var(--line);
 }
 
-
-/* Mobile */
-
+/* ============================================
+   Mobile
+   ============================================ */
 @media (max-width: 800px) {
+    body {
+        padding: 18px 12px 50px;
+    }
+
+    .stage {
+        padding: 22px 18px;
+    }
 
     .teams {
-
         flex-direction: column;
+    }
 
+    .team:first-of-type {
+        border-right: none;
+        border-bottom: 1px solid var(--line);
     }
 
     .pair-container {
-
         flex-direction: column;
-
     }
 
     .pair {
-
         width: 100%;
-
     }
 
     .input-row,
-
     .preset-row {
-
         flex-direction: column;
-
     }
 
+    .tab {
+        font-size: 12px;
+        padding: 11px 6px;
+    }
 }
