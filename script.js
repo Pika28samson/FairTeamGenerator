@@ -386,7 +386,6 @@ function renderPairs() {
         new Sortable(list, {
             group: "shared",
             animation: 150,
-            onAdd: syncFromDOM,
             onEnd: syncFromDOM
         });
     });
@@ -411,7 +410,6 @@ function renderPairs() {
     new Sortable(unpairedBox, {
         group: "shared",
         animation: 150,
-        onAdd: syncFromDOM,
         onEnd: syncFromDOM
     });
 }
