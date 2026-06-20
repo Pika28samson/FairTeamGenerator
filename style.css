@@ -41,15 +41,20 @@
     box-sizing: border-box;
 }
 
+@keyframes drift-glow {
+    0%, 100% { background-position: 0% 0%, 100% 0%, 0 0; }
+    50% { background-position: 4% 3%, 96% 4%, 0 0; }
+}
+
 body {
     margin: 0;
-    padding: 28px 18px 60px;
+    padding: 22px 14px 56px;
     font-family: var(--font-body);
     color: var(--text);
     background-color: var(--ink);
     background-image:
-        radial-gradient(circle at 18% 8%, rgba(255, 107, 53, 0.18), transparent 40%),
-        radial-gradient(circle at 85% 0%, rgba(30, 58, 95, 0.35), transparent 45%),
+        radial-gradient(circle at 18% 8%, rgba(255, 107, 53, 0.22), transparent 42%),
+        radial-gradient(circle at 85% 0%, rgba(30, 58, 95, 0.4), transparent 48%),
         repeating-linear-gradient(
             -35deg,
             rgba(255, 255, 255, 0.02) 0px,
@@ -57,6 +62,8 @@ body {
             transparent 2px,
             transparent 26px
         );
+    background-size: 140% 140%, 140% 140%, auto;
+    animation: drift-glow 14s ease-in-out infinite;
     min-height: 100vh;
 }
 
@@ -72,10 +79,16 @@ h1 {
     text-align: center;
     margin: 0 0 6px;
     font-family: var(--font-display);
-    font-size: clamp(26px, 5vw, 42px);
+    font-size: clamp(24px, 6vw, 42px);
     letter-spacing: 0.5px;
     color: var(--text-on-dark);
     text-shadow: 0 2px 0 rgba(0,0,0,0.4);
+    animation: h1-drop 0.5s cubic-bezier(.25, 1.4, .5, 1) both;
+}
+
+@keyframes h1-drop {
+    from { opacity: 0; transform: translateY(-14px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .court-subtitle {
@@ -129,17 +142,21 @@ h3 {
    ============================================ */
 .tabs {
     display: flex;
-    gap: 8px;
-    margin-bottom: 18px;
+    gap: 6px;
+    margin-bottom: 16px;
     background: rgba(255, 255, 255, 0.06);
     padding: 6px;
     border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.08);
+    position: sticky;
+    top: 8px;
+    z-index: 10;
+    backdrop-filter: blur(10px);
 }
 
 .tab {
     flex: 1;
-    padding: 13px 10px;
+    padding: 14px 8px;
     border: none;
     border-radius: 11px;
     background: transparent;
@@ -148,7 +165,9 @@ h3 {
     font-family: var(--font-display);
     font-size: 14px;
     letter-spacing: 0.5px;
-    transition: 0.18s ease;
+    transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+    min-height: 46px;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .tab:hover {
@@ -157,10 +176,19 @@ h3 {
     transform: none;
 }
 
+.tab:active {
+    transform: scale(0.96);
+}
+
+@keyframes tab-glow-pulse {
+    0%, 100% { box-shadow: 0 6px 16px -4px rgba(255, 107, 53, 0.6); }
+    50% { box-shadow: 0 6px 22px -2px rgba(255, 107, 53, 0.85); }
+}
+
 .tab.active {
     background: var(--orange);
     color: #fff;
-    box-shadow: 0 6px 16px -4px rgba(255, 107, 53, 0.6);
+    animation: tab-glow-pulse 2.4s ease-in-out infinite;
 }
 
 /* ============================================
@@ -228,7 +256,7 @@ select {
    ============================================ */
 button {
     border: none;
-    padding: 13px 20px;
+    padding: 14px 20px;
     border-radius: var(--radius-sm);
     background: var(--ink);
     color: #fff;
@@ -236,7 +264,10 @@ button {
     font-size: 14.5px;
     font-weight: 600;
     font-family: var(--font-body);
-    transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+    min-height: 46px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
 }
 
 button:hover {
@@ -246,7 +277,8 @@ button:hover {
 }
 
 button:active {
-    transform: translateY(0);
+    transform: translateY(0) scale(0.97);
+    opacity: 0.85;
 }
 
 button:focus-visible {
@@ -293,7 +325,7 @@ button.danger:hover {
 .player {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 14px;
     padding: 14px 16px;
     background: var(--panel-dim);
     border: 1.5px solid var(--line);
@@ -301,11 +333,21 @@ button.danger:hover {
     cursor: grab;
     transition: border-color 0.15s, box-shadow 0.15s;
     position: relative;
+    animation: player-pop 0.28s cubic-bezier(.3, 1.4, .5, 1) both;
+}
+
+@keyframes player-pop {
+    from { opacity: 0; transform: scale(0.94) translateY(4px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 .player:hover {
     border-color: #d6d9de;
     box-shadow: 0 4px 14px -6px rgba(15, 17, 21, 0.12);
+}
+
+.player:active {
+    box-shadow: var(--shadow-pop);
 }
 
 .player::before {
@@ -331,8 +373,8 @@ button.danger:hover {
 
 .player input[type="checkbox"] {
     flex: 0 0 auto;
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     accent-color: var(--orange);
     cursor: pointer;
 }
@@ -346,15 +388,21 @@ button.danger:hover {
 .player-remove {
     background: transparent;
     color: var(--jersey-red);
-    padding: 8px 11px;
+    padding: 10px 13px;
     font-size: 13px;
     font-weight: 700;
+    min-height: 40px;
 }
 
 .player-remove:hover {
     background: rgba(200, 30, 58, 0.1);
     box-shadow: none;
     transform: none;
+}
+
+.player-remove:active {
+    background: rgba(200, 30, 58, 0.18);
+    transform: scale(0.94);
 }
 
 /* Checkbox row */
@@ -436,7 +484,7 @@ button.danger:hover {
 }
 
 .pair-player {
-    padding: 11px 13px;
+    padding: 12px 13px;
     border-radius: var(--radius-sm);
     background: var(--panel);
     border: 1.5px solid var(--line);
@@ -444,6 +492,12 @@ button.danger:hover {
     font-size: 14.5px;
     font-weight: 600;
     box-shadow: 0 1px 0 rgba(0,0,0,0.02);
+    animation: player-pop 0.24s cubic-bezier(.3, 1.4, .5, 1) both;
+    min-height: 24px;
+}
+
+.pair-player:active {
+    box-shadow: var(--shadow-pop);
 }
 
 .unpaired-box {
@@ -462,15 +516,35 @@ button.danger:hover {
 .teams {
     display: flex;
     gap: 0;
-    margin-top: 24px;
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    box-shadow: var(--shadow-card);
+    margin-top: 28px;
     position: relative;
 }
 
-.teams::after {
-    content: "VS";
+.team {
+    flex: 1;
+    background: var(--panel);
+    padding: 26px 20px 26px;
+    position: relative;
+    box-shadow: var(--shadow-card);
+}
+
+.team:first-of-type {
+    background: linear-gradient(180deg, rgba(30, 58, 95, 0.07), transparent 120px);
+    border-right: 1px solid var(--line);
+    border-radius: var(--radius-md) 0 0 var(--radius-md);
+}
+
+.team:last-of-type {
+    background: linear-gradient(180deg, rgba(200, 30, 58, 0.07), transparent 120px);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+@keyframes vs-pulse {
+    0%, 100% { box-shadow: 0 0 0 5px var(--panel), 0 6px 16px -4px rgba(0,0,0,0.4), 0 0 0 0 rgba(255, 107, 53, 0.5); }
+    50% { box-shadow: 0 0 0 5px var(--panel), 0 6px 16px -4px rgba(0,0,0,0.4), 0 0 0 9px rgba(255, 107, 53, 0); }
+}
+
+.vs-badge {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -479,38 +553,42 @@ button.danger:hover {
     font-size: 18px;
     color: #fff;
     background: var(--ink);
-    width: 44px;
-    height: 44px;
+    width: 46px;
+    height: 46px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 0 5px var(--panel), 0 6px 16px -4px rgba(0,0,0,0.4);
-    z-index: 2;
+    z-index: 3;
     letter-spacing: 0.5px;
+    animation: vs-pulse 2.2s ease-in-out infinite, vs-pop-in 0.4s cubic-bezier(.3, 1.6, .5, 1) both;
+    animation-delay: 0s, 0.15s;
+    pointer-events: none;
+}
+
+@keyframes vs-pop-in {
+    from { transform: translate(-50%, -50%) scale(0.4) rotate(-20deg); opacity: 0; }
+    to { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
 }
 
 @media (max-width: 800px) {
-    .teams::after {
-        top: 0;
-        transform: translate(-50%, -50%);
+    .teams {
+        flex-direction: column;
+        gap: 14px;
     }
-}
 
-.team {
-    flex: 1;
-    background: var(--panel);
-    padding: 24px 20px 26px;
-    position: relative;
-}
+    .team {
+        border-radius: var(--radius-md) !important;
+    }
 
-.team:first-of-type {
-    background: linear-gradient(180deg, rgba(30, 58, 95, 0.07), transparent 120px);
-    border-right: 1px solid var(--line);
-}
+    .team:first-of-type {
+        border-right: none;
+    }
 
-.team:last-of-type {
-    background: linear-gradient(180deg, rgba(200, 30, 58, 0.07), transparent 120px);
+    .vs-badge {
+        top: calc(50% + 7px);
+        left: 50%;
+    }
 }
 
 .team h3 {
@@ -539,19 +617,23 @@ button.danger:hover {
 }
 
 .team li {
-    padding: 12px 14px;
+    padding: 13px 14px;
     margin-bottom: 9px;
     background: var(--panel-dim);
     border-radius: var(--radius-sm);
     border: 1.5px solid var(--line);
     font-weight: 600;
     font-size: 14.5px;
-    animation: roster-in 0.3s ease both;
+    animation: roster-in 0.36s cubic-bezier(.3, 1.3, .5, 1) both;
 }
 
-.team li:nth-child(n) {
-    animation-delay: calc(0.04s * var(--i, 0));
-}
+.team li:nth-child(1) { animation-delay: 0.05s; }
+.team li:nth-child(2) { animation-delay: 0.1s; }
+.team li:nth-child(3) { animation-delay: 0.15s; }
+.team li:nth-child(4) { animation-delay: 0.2s; }
+.team li:nth-child(5) { animation-delay: 0.25s; }
+.team li:nth-child(6) { animation-delay: 0.3s; }
+.team li:nth-child(n+7) { animation-delay: 0.35s; }
 
 @keyframes roster-in {
     from { opacity: 0; transform: translateX(-6px); }
@@ -616,20 +698,12 @@ hr {
    ============================================ */
 @media (max-width: 800px) {
     body {
-        padding: 18px 12px 50px;
+        padding: 16px 10px 50px;
     }
 
     .stage {
-        padding: 22px 18px;
-    }
-
-    .teams {
-        flex-direction: column;
-    }
-
-    .team:first-of-type {
-        border-right: none;
-        border-bottom: 1px solid var(--line);
+        padding: 20px 16px;
+        border-radius: 16px;
     }
 
     .pair-container {
@@ -647,6 +721,38 @@ hr {
 
     .tab {
         font-size: 12px;
-        padding: 11px 6px;
+        padding: 13px 6px;
+    }
+
+    .buttons {
+        gap: 8px;
+    }
+
+    .buttons button {
+        flex: 1;
+        min-width: 0;
+    }
+
+    h2 {
+        font-size: 19px;
+    }
+
+    .player-rank {
+        width: 34px;
+        height: 34px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 420px) {
+    .court-subtitle {
+        letter-spacing: 2px;
+        font-size: 11px;
+    }
+
+    .vs-badge {
+        width: 40px;
+        height: 40px;
+        font-size: 15px;
     }
 }
