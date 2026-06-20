@@ -1,32 +1,34 @@
 /* ============================================
    COURTSIDE — Basketball Team Generator
-   Design tokens
+   Hardwood court design system
    ============================================ */
 :root {
-    --ink: #0f1115;
-    --ink-soft: #171a21;
-    --panel: #ffffff;
-    --panel-dim: #f4f5f7;
-    --line: #e3e5ea;
+    --wood-dark: #6b4226;
+    --wood: #c8915a;
+    --wood-light: #e8b873;
+    --wood-grain: #a8703f;
+    --shadow-wood: #2b1810;
 
-    --orange: #ff6b35;
-    --orange-dark: #e0501f;
-    --court-blue: #1e3a5f;
-    --court-blue-light: #2c5183;
-    --jersey-red: #c81e3a;
-    --jersey-red-light: #df2f4c;
-    --amber: #f5c518;
+    --paint-green: #16321e;
+    --paint-green-light: #1f4429;
+    --line-red: #d64545;
+    --line-red-dark: #b53636;
+    --amber: #ffb74d;
 
-    --text: #1a1d23;
-    --text-dim: #6b7280;
-    --text-on-dark: #f4f5f7;
+    --panel: #fffaf2;
+    --panel-soft: #fbf3e6;
+    --chalk: #ffffff;
+    --ink: #2b1810;
+    --text: #2b1810;
+    --text-dim: #7a6450;
+    --line: #e3d2b8;
 
-    --radius-lg: 20px;
+    --radius-lg: 22px;
     --radius-md: 14px;
-    --radius-sm: 8px;
+    --radius-sm: 9px;
 
-    --shadow-card: 0 10px 30px -12px rgba(15, 17, 21, 0.18);
-    --shadow-pop: 0 16px 40px -10px rgba(15, 17, 21, 0.28);
+    --shadow-card: 0 14px 34px -14px rgba(43, 24, 16, 0.35);
+    --shadow-pop: 0 18px 42px -10px rgba(43, 24, 16, 0.45);
 
     --font-display: "Arial Black", Arial, sans-serif;
     --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -41,74 +43,111 @@
     box-sizing: border-box;
 }
 
-@keyframes drift-glow {
-    0%, 100% { background-position: 0% 0%, 100% 0%, 0 0; }
-    50% { background-position: 4% 3%, 96% 4%, 0 0; }
+html {
+    scroll-behavior: smooth;
+}
+
+@keyframes grain-drift {
+    0%, 100% { background-position: 0 0, 0 0, 0% 0%; }
+    50% { background-position: 0 6px, 4px 0, 2% 1%; }
 }
 
 body {
     margin: 0;
-    padding: 22px 14px 56px;
+    padding: 18px 12px 56px;
     font-family: var(--font-body);
     color: var(--text);
-    background-color: var(--ink);
+    background-color: var(--wood);
     background-image:
-        radial-gradient(circle at 18% 8%, rgba(255, 107, 53, 0.22), transparent 42%),
-        radial-gradient(circle at 85% 0%, rgba(30, 58, 95, 0.4), transparent 48%),
         repeating-linear-gradient(
-            -35deg,
-            rgba(255, 255, 255, 0.02) 0px,
-            rgba(255, 255, 255, 0.02) 2px,
+            90deg,
+            rgba(43, 24, 16, 0.1) 0px,
+            rgba(43, 24, 16, 0.1) 2px,
             transparent 2px,
-            transparent 26px
-        );
-    background-size: 140% 140%, 140% 140%, auto;
-    animation: drift-glow 14s ease-in-out infinite;
+            transparent 96px
+        ),
+        repeating-linear-gradient(
+            0deg,
+            rgba(168, 112, 63, 0.35) 0px,
+            rgba(168, 112, 63, 0.35) 1px,
+            transparent 1px,
+            transparent 7px
+        ),
+        radial-gradient(ellipse at 30% 0%, rgba(232, 184, 115, 0.5), transparent 55%);
+    background-size: 96px 100%, 100% 7px, 140% 100%;
+    animation: grain-drift 18s ease-in-out infinite;
     min-height: 100vh;
 }
 
 .container {
     max-width: 1080px;
     margin: auto;
+    position: relative;
 }
 
 /* ============================================
-   HEADER / SCOREBOARD MARQUEE
+   HEADER — painted court signage
    ============================================ */
-h1 {
-    text-align: center;
-    margin: 0 0 6px;
-    font-family: var(--font-display);
-    font-size: clamp(24px, 6vw, 42px);
-    letter-spacing: 0.5px;
-    color: var(--text-on-dark);
-    text-shadow: 0 2px 0 rgba(0,0,0,0.4);
-    animation: h1-drop 0.5s cubic-bezier(.25, 1.4, .5, 1) both;
+@keyframes h1-drop {
+    from { opacity: 0; transform: translateY(-16px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-@keyframes h1-drop {
-    from { opacity: 0; transform: translateY(-14px) scale(0.96); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
+.court-header {
+    text-align: center;
+    margin: 6px 0 22px;
+    padding: 18px 16px 16px;
+    position: relative;
+}
+
+.court-header::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: min(70%, 360px);
+    height: 3px;
+    background: repeating-linear-gradient(
+        90deg,
+        var(--chalk) 0px, var(--chalk) 14px,
+        transparent 14px, transparent 24px
+    );
+    opacity: 0.85;
+    border-radius: 2px;
+}
+
+h1 {
+    text-align: center;
+    margin: 0 0 4px;
+    font-family: var(--font-display);
+    font-size: clamp(24px, 7vw, 40px);
+    letter-spacing: 0.5px;
+    color: var(--chalk);
+    text-shadow:
+        0 2px 0 var(--shadow-wood),
+        0 4px 12px rgba(43, 24, 16, 0.4);
+    animation: h1-drop 0.5s cubic-bezier(.25, 1.4, .5, 1) both;
 }
 
 .court-subtitle {
     text-align: center;
-    color: rgba(244, 245, 247, 0.55);
+    color: rgba(255, 250, 242, 0.8);
     font-family: var(--font-mono);
     font-size: 12px;
     letter-spacing: 3px;
     text-transform: uppercase;
-    margin-bottom: 26px;
+    margin: 0;
 }
 
 h2 {
     margin-top: 0;
     font-family: var(--font-display);
-    font-size: 22px;
+    font-size: 21px;
     letter-spacing: 0.3px;
     color: var(--ink);
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 10px;
 }
 
@@ -117,41 +156,41 @@ h2 .stage-tag {
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 2px;
-    color: var(--panel);
-    background: var(--orange);
-    padding: 4px 9px;
-    border-radius: 6px;
-    transform: translateY(-1px);
+    color: var(--chalk);
+    background: var(--line-red);
+    padding: 5px 10px;
+    border-radius: 7px;
+    flex-shrink: 0;
 }
 
 h3 {
     margin-top: 0;
     font-family: var(--font-display);
     letter-spacing: 0.2px;
+    color: var(--ink);
 }
 
 .desc {
     color: var(--text-dim);
     margin-bottom: 22px;
     font-size: 14.5px;
-    line-height: 1.5;
+    line-height: 1.55;
 }
 
 /* ============================================
-   TABS — scoreboard "PERIOD" selector
+   TABS — court period markers
    ============================================ */
 .tabs {
     display: flex;
     gap: 6px;
     margin-bottom: 16px;
-    background: rgba(255, 255, 255, 0.06);
+    background: var(--shadow-wood);
     padding: 6px;
     border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
     position: sticky;
     top: 8px;
     z-index: 10;
-    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-card);
 }
 
 .tab {
@@ -160,19 +199,19 @@ h3 {
     border: none;
     border-radius: 11px;
     background: transparent;
-    color: rgba(244, 245, 247, 0.5);
+    color: rgba(255, 250, 242, 0.55);
     cursor: pointer;
     font-family: var(--font-display);
     font-size: 14px;
     letter-spacing: 0.5px;
-    transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+    transition: background 0.18s ease, color 0.18s ease;
     min-height: 46px;
     -webkit-tap-highlight-color: transparent;
 }
 
 .tab:hover {
-    color: var(--text-on-dark);
-    background: rgba(255, 255, 255, 0.06);
+    color: var(--chalk);
+    background: rgba(255, 255, 255, 0.08);
     transform: none;
 }
 
@@ -181,30 +220,43 @@ h3 {
 }
 
 @keyframes tab-glow-pulse {
-    0%, 100% { box-shadow: 0 6px 16px -4px rgba(255, 107, 53, 0.6); }
-    50% { box-shadow: 0 6px 22px -2px rgba(255, 107, 53, 0.85); }
+    0%, 100% { box-shadow: 0 4px 14px -2px rgba(214, 69, 69, 0.6); }
+    50% { box-shadow: 0 4px 20px 0px rgba(214, 69, 69, 0.85); }
 }
 
 .tab.active {
-    background: var(--orange);
-    color: #fff;
+    background: var(--line-red);
+    color: var(--chalk);
     animation: tab-glow-pulse 2.4s ease-in-out infinite;
 }
 
 /* ============================================
-   STAGE PANELS
+   STAGE PANELS — court tiles
    ============================================ */
+@keyframes stage-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 .stage {
     background: var(--panel);
     border-radius: var(--radius-lg);
-    padding: 30px;
+    padding: 26px 24px;
     box-shadow: var(--shadow-card);
-    animation: stage-in 0.32s ease both;
+    animation: stage-in 0.34s ease both;
+    border: 1px solid rgba(43, 24, 16, 0.08);
+    position: relative;
+    overflow: hidden;
 }
 
-@keyframes stage-in {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
+.stage::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--line-red), var(--amber), var(--paint-green));
 }
 
 .hidden {
@@ -229,20 +281,20 @@ select {
     border: 1.5px solid var(--line);
     font-size: 15px;
     font-family: var(--font-body);
-    background: var(--panel-dim);
+    background: var(--panel-soft);
     color: var(--text);
     transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 input::placeholder {
-    color: #9aa0aa;
+    color: #b29a7d;
 }
 
 input:focus,
 select:focus {
     outline: none;
-    border-color: var(--orange);
-    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.18);
+    border-color: var(--line-red);
+    box-shadow: 0 0 0 3px rgba(214, 69, 69, 0.18);
     background: var(--panel);
 }
 
@@ -259,7 +311,7 @@ button {
     padding: 14px 20px;
     border-radius: var(--radius-sm);
     background: var(--ink);
-    color: #fff;
+    color: var(--chalk);
     cursor: pointer;
     font-size: 14.5px;
     font-weight: 600;
@@ -273,7 +325,7 @@ button {
 button:hover {
     opacity: 0.92;
     transform: translateY(-2px);
-    box-shadow: 0 8px 18px -6px rgba(15, 17, 21, 0.35);
+    box-shadow: 0 8px 18px -6px rgba(43, 24, 16, 0.4);
 }
 
 button:active {
@@ -287,19 +339,19 @@ button:focus-visible {
 }
 
 button.primary {
-    background: var(--orange);
+    background: var(--paint-green);
 }
 
 button.primary:hover {
-    box-shadow: 0 8px 18px -6px rgba(255, 107, 53, 0.55);
+    box-shadow: 0 8px 18px -6px rgba(22, 50, 30, 0.5);
 }
 
 button.danger {
-    background: var(--jersey-red);
+    background: var(--line-red);
 }
 
 button.danger:hover {
-    box-shadow: 0 8px 18px -6px rgba(200, 30, 58, 0.5);
+    box-shadow: 0 8px 18px -6px rgba(214, 69, 69, 0.5);
 }
 
 .buttons {
@@ -314,7 +366,7 @@ button.danger:hover {
 }
 
 /* ============================================
-   PLAYER LIST (Stage 1) — draft board rows
+   PLAYER LIST (Stage 1) — lineup card
    ============================================ */
 .player-list {
     display: flex;
@@ -322,28 +374,30 @@ button.danger:hover {
     gap: 10px;
 }
 
-.player {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 14px 16px;
-    background: var(--panel-dim);
-    border: 1.5px solid var(--line);
-    border-radius: var(--radius-md);
-    cursor: grab;
-    transition: border-color 0.15s, box-shadow 0.15s;
-    position: relative;
-    animation: player-pop 0.28s cubic-bezier(.3, 1.4, .5, 1) both;
-}
-
 @keyframes player-pop {
     from { opacity: 0; transform: scale(0.94) translateY(4px); }
     to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
+.player {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 15px;
+    background: var(--panel-soft);
+    border: 1.5px solid var(--line);
+    border-left: 4px solid var(--paint-green);
+    border-radius: var(--radius-md);
+    cursor: grab;
+    transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+    position: relative;
+    animation: player-pop 0.28s cubic-bezier(.3, 1.4, .5, 1) both;
+}
+
 .player:hover {
-    border-color: #d6d9de;
-    box-shadow: 0 4px 14px -6px rgba(15, 17, 21, 0.12);
+    border-color: #d8c6a8;
+    border-left-color: var(--paint-green-light);
+    box-shadow: 0 6px 16px -8px rgba(43, 24, 16, 0.3);
 }
 
 .player:active {
@@ -352,30 +406,30 @@ button.danger:hover {
 
 .player::before {
     content: "⠿";
-    color: #c2c6cc;
+    color: #c4ab87;
     font-size: 15px;
     letter-spacing: -2px;
 }
 
 .player-rank {
-    width: 38px;
-    height: 38px;
+    width: 36px;
+    height: 36px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: var(--font-display);
-    font-size: 15px;
-    color: #fff;
-    background: var(--court-blue);
-    border-radius: 9px;
+    font-size: 14px;
+    color: var(--chalk);
+    background: var(--ink);
+    border-radius: 50%;
 }
 
 .player input[type="checkbox"] {
     flex: 0 0 auto;
     width: 22px;
     height: 22px;
-    accent-color: var(--orange);
+    accent-color: var(--line-red);
     cursor: pointer;
 }
 
@@ -387,7 +441,7 @@ button.danger:hover {
 
 .player-remove {
     background: transparent;
-    color: var(--jersey-red);
+    color: var(--line-red);
     padding: 10px 13px;
     font-size: 13px;
     font-weight: 700;
@@ -395,13 +449,13 @@ button.danger:hover {
 }
 
 .player-remove:hover {
-    background: rgba(200, 30, 58, 0.1);
+    background: rgba(214, 69, 69, 0.1);
     box-shadow: none;
     transform: none;
 }
 
 .player-remove:active {
-    background: rgba(200, 30, 58, 0.18);
+    background: rgba(214, 69, 69, 0.18);
     transform: scale(0.94);
 }
 
@@ -413,17 +467,18 @@ button.danger:hover {
     margin-bottom: 16px;
     font-weight: 600;
     font-size: 14.5px;
+    color: var(--ink);
 }
 
 .checkbox-row input[type="checkbox"] {
     width: 19px;
     height: 19px;
-    accent-color: var(--orange);
+    accent-color: var(--line-red);
     cursor: pointer;
 }
 
 /* ============================================
-   PAIR AREA (Stage 2) — matchup cards
+   PAIR AREA (Stage 2) — matchup courts
    ============================================ */
 .pair-container {
     display: flex;
@@ -435,11 +490,24 @@ button.danger:hover {
 .pair {
     width: 230px;
     min-height: 160px;
-    background: var(--panel-dim);
+    background: var(--panel-soft);
     border: 2px solid var(--line);
     border-radius: var(--radius-md);
     padding: 14px;
     transition: border-color 0.15s;
+    position: relative;
+}
+
+.pair::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 8px;
+    right: 8px;
+    height: 1px;
+    background: repeating-linear-gradient(90deg, var(--line) 0, var(--line) 6px, transparent 6px, transparent 11px);
+    pointer-events: none;
+    z-index: 0;
 }
 
 .pair-header {
@@ -447,11 +515,13 @@ button.danger:hover {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 12px;
+    position: relative;
+    z-index: 1;
 }
 
 .pair-header h3 {
     margin: 0;
-    font-size: 14px;
+    font-size: 13px;
     letter-spacing: 1px;
     text-transform: uppercase;
     color: var(--text-dim);
@@ -459,20 +529,20 @@ button.danger:hover {
 
 .pair-header button {
     background: transparent;
-    color: var(--jersey-red);
+    color: var(--line-red);
     padding: 4px 9px;
     font-size: 12px;
     font-weight: 700;
 }
 
 .pair-header button:hover {
-    background: rgba(200, 30, 58, 0.1);
+    background: rgba(214, 69, 69, 0.1);
     box-shadow: none;
     transform: none;
 }
 
 .delete-pair {
-    background: var(--jersey-red);
+    background: var(--line-red);
     padding: 6px 10px;
 }
 
@@ -481,6 +551,13 @@ button.danger:hover {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes chip-pop {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
 }
 
 .pair-player {
@@ -492,7 +569,7 @@ button.danger:hover {
     font-size: 14.5px;
     font-weight: 600;
     box-shadow: 0 1px 0 rgba(0,0,0,0.02);
-    animation: player-pop 0.24s cubic-bezier(.3, 1.4, .5, 1) both;
+    animation: chip-pop 0.22s cubic-bezier(.3, 1.4, .5, 1) both;
     min-height: 24px;
 }
 
@@ -503,7 +580,11 @@ button.danger:hover {
 .unpaired-box {
     margin-top: 18px;
     border-style: dashed;
-    background: var(--panel-dim);
+    background: var(--panel-soft);
+}
+
+.unpaired-box::after {
+    display: none;
 }
 
 .unpaired-box .pair-header h3::before {
@@ -511,58 +592,28 @@ button.danger:hover {
 }
 
 /* ============================================
-   TEAMS (Stage 3) — split scoreboard
+   TEAMS (Stage 3) — tip-off layout
    ============================================ */
-.teams {
-    display: flex;
-    gap: 0;
-    margin-top: 28px;
+.tipoff-wrap {
     position: relative;
+    margin-top: 26px;
 }
 
-.team {
-    flex: 1;
-    background: var(--panel);
-    padding: 26px 20px 26px;
-    position: relative;
-    box-shadow: var(--shadow-card);
-}
-
-.team:first-of-type {
-    background: linear-gradient(180deg, rgba(30, 58, 95, 0.07), transparent 120px);
-    border-right: 1px solid var(--line);
-    border-radius: var(--radius-md) 0 0 var(--radius-md);
-}
-
-.team:last-of-type {
-    background: linear-gradient(180deg, rgba(200, 30, 58, 0.07), transparent 120px);
-    border-radius: 0 var(--radius-md) var(--radius-md) 0;
-}
-
-@keyframes vs-pulse {
-    0%, 100% { box-shadow: 0 0 0 5px var(--panel), 0 6px 16px -4px rgba(0,0,0,0.4), 0 0 0 0 rgba(255, 107, 53, 0.5); }
-    50% { box-shadow: 0 0 0 5px var(--panel), 0 6px 16px -4px rgba(0,0,0,0.4), 0 0 0 9px rgba(255, 107, 53, 0); }
-}
-
-.vs-badge {
+.center-circle {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-family: var(--font-display);
-    font-size: 18px;
-    color: #fff;
-    background: var(--ink);
-    width: 46px;
-    height: 46px;
+    width: 84px;
+    height: 84px;
+    border: 3px solid var(--chalk);
     border-radius: 50%;
+    background: var(--paint-green);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 3;
-    letter-spacing: 0.5px;
-    animation: vs-pulse 2.2s ease-in-out infinite, vs-pop-in 0.4s cubic-bezier(.3, 1.6, .5, 1) both;
-    animation-delay: 0s, 0.15s;
+    box-shadow: 0 0 0 6px var(--panel), var(--shadow-card);
     pointer-events: none;
 }
 
@@ -571,44 +622,66 @@ button.danger:hover {
     to { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
 }
 
-@media (max-width: 800px) {
-    .teams {
-        flex-direction: column;
-        gap: 14px;
-    }
+@keyframes vs-pulse {
+    0%, 100% { box-shadow: 0 0 0 6px var(--panel), var(--shadow-card), 0 0 0 0 rgba(214, 69, 69, 0.5); }
+    50% { box-shadow: 0 0 0 6px var(--panel), var(--shadow-card), 0 0 0 10px rgba(214, 69, 69, 0); }
+}
 
-    .team {
-        border-radius: var(--radius-md) !important;
-    }
+.center-circle {
+    animation: vs-pop-in 0.45s cubic-bezier(.3, 1.6, .5, 1) both, vs-pulse 2.4s ease-in-out infinite;
+    animation-delay: 0s, 0.2s;
+}
 
-    .team:first-of-type {
-        border-right: none;
-    }
+.center-circle span {
+    font-family: var(--font-display);
+    color: var(--chalk);
+    font-size: 17px;
+    letter-spacing: 0.5px;
+}
 
-    .vs-badge {
-        top: calc(50% + 7px);
-        left: 50%;
-    }
+.teams {
+    display: flex;
+    gap: 14px;
+}
+
+.team {
+    flex: 1;
+    background: var(--panel);
+    padding: 26px 18px 22px;
+    position: relative;
+    box-shadow: var(--shadow-card);
+    border-radius: var(--radius-md);
+    border-top: 5px solid transparent;
+}
+
+.team:first-of-type {
+    background: linear-gradient(180deg, rgba(22, 50, 30, 0.08), transparent 130px);
+    border-top-color: var(--paint-green);
+}
+
+.team:last-of-type {
+    background: linear-gradient(180deg, rgba(214, 69, 69, 0.08), transparent 130px);
+    border-top-color: var(--line-red);
 }
 
 .team h3 {
     text-align: center;
-    font-size: 17px;
+    font-size: 16px;
     letter-spacing: 1.5px;
     text-transform: uppercase;
     margin-bottom: 16px;
 }
 
 .team:first-of-type h3 {
-    color: var(--court-blue);
+    color: var(--paint-green);
 }
 
 .team:last-of-type h3 {
-    color: var(--jersey-red);
+    color: var(--line-red);
 }
 
-.team:first-of-type h3::before { content: "🔵 "; font-size: 12px; }
-.team:last-of-type h3::before { content: "🔴 "; font-size: 12px; }
+.team:first-of-type h3::before { content: "🟢 "; font-size: 11px; }
+.team:last-of-type h3::before { content: "🔴 "; font-size: 11px; }
 
 .team ul {
     list-style: none;
@@ -616,15 +689,29 @@ button.danger:hover {
     margin: 0;
 }
 
+@keyframes roster-in {
+    from { opacity: 0; transform: translateX(-6px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes roster-in-right {
+    from { opacity: 0; transform: translateX(6px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
 .team li {
-    padding: 13px 14px;
+    padding: 12px 14px;
     margin-bottom: 9px;
-    background: var(--panel-dim);
+    background: var(--panel-soft);
     border-radius: var(--radius-sm);
     border: 1.5px solid var(--line);
     font-weight: 600;
-    font-size: 14.5px;
+    font-size: 14px;
     animation: roster-in 0.36s cubic-bezier(.3, 1.3, .5, 1) both;
+}
+
+.team:last-of-type li {
+    animation-name: roster-in-right;
 }
 
 .team li:nth-child(1) { animation-delay: 0.05s; }
@@ -634,20 +721,6 @@ button.danger:hover {
 .team li:nth-child(5) { animation-delay: 0.25s; }
 .team li:nth-child(6) { animation-delay: 0.3s; }
 .team li:nth-child(n+7) { animation-delay: 0.35s; }
-
-@keyframes roster-in {
-    from { opacity: 0; transform: translateX(-6px); }
-    to { opacity: 1; transform: translateX(0); }
-}
-
-.team:last-of-type li {
-    animation-name: roster-in-right;
-}
-
-@keyframes roster-in-right {
-    from { opacity: 0; transform: translateX(6px); }
-    to { opacity: 1; transform: translateX(0); }
-}
 
 .score {
     text-align: center;
@@ -688,9 +761,9 @@ button.danger:hover {
    Divider
    ============================================ */
 hr {
-    margin: 30px 0;
+    margin: 28px 0;
     border: none;
-    border-top: 1px dashed var(--line);
+    border-top: 2px dashed var(--line);
 }
 
 /* ============================================
@@ -698,12 +771,31 @@ hr {
    ============================================ */
 @media (max-width: 800px) {
     body {
-        padding: 16px 10px 50px;
+        padding: 14px 8px 50px;
+    }
+
+    .court-header {
+        padding: 14px 10px 14px;
+        margin-bottom: 18px;
     }
 
     .stage {
         padding: 20px 16px;
         border-radius: 16px;
+    }
+
+    .teams {
+        flex-direction: column;
+        gap: 38px;
+    }
+
+    .center-circle {
+        width: 64px;
+        height: 64px;
+    }
+
+    .center-circle span {
+        font-size: 14px;
     }
 
     .pair-container {
@@ -734,13 +826,13 @@ hr {
     }
 
     h2 {
-        font-size: 19px;
+        font-size: 18px;
     }
 
     .player-rank {
-        width: 34px;
-        height: 34px;
-        font-size: 13px;
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
     }
 }
 
@@ -748,11 +840,5 @@ hr {
     .court-subtitle {
         letter-spacing: 2px;
         font-size: 11px;
-    }
-
-    .vs-badge {
-        width: 40px;
-        height: 40px;
-        font-size: 15px;
     }
 }
