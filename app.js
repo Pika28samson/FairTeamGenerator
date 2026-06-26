@@ -14,6 +14,13 @@
     teams: null            // {a:[ids], b:[ids]} last generated
   };
 
+  let coinState = {
+    headsImage: '',
+    tailsImage: '',
+    headsProbability: 50,
+    lastResult: null
+  };
+
   let uid = 1;
   function nextId(){ return 'p' + (uid++); }
 
@@ -56,6 +63,31 @@
   const closeDrawerBtn = $('#closeDrawerBtn');
   const presetList = $('#presetList');
 
+  const coinFab = $('#coinFab');
+  const coinPage = $('#coinPage');
+  const coinBackBtn = $('#coinBackBtn');
+  const coin3d = $('#coin3d');
+  const coinHeadsFace = $('#coinHeadsFace');
+  const coinTailsFace = $('#coinTailsFace');
+  const coinResult = $('#coinResult');
+  const flipCoinBtn = $('#flipCoinBtn');
+  const headsImageInput = $('#headsImageInput');
+  const tailsImageInput = $('#tailsImageInput');
+  const headsProbability = $('#headsProbability');
+  const headsProbabilityLabel = $('#headsProbabilityLabel');
+  const tailsProbabilityLabel = $('#tailsProbabilityLabel');
+  const coinPresetNameInput = $('#coinPresetNameInput');
+  const saveCoinPresetBtn = $('#saveCoinPresetBtn');
+  const coinPresetList = $('#coinPresetList');
+
+  const cropModalOverlay = $('#cropModalOverlay');
+  const cropModalTitle = $('#cropModalTitle');
+  const cropWorkspace = $('#cropWorkspace');
+  const cropCanvas = $('#cropCanvas');
+  const cropZoom = $('#cropZoom');
+  const cancelCropBtn = $('#cancelCropBtn');
+  const applyCropBtn = $('#applyCropBtn');
+
   const saveModalOverlay = $('#saveModalOverlay');
   const presetNameInput = $('#presetNameInput');
   const cancelSaveBtn = $('#cancelSaveBtn');
@@ -70,6 +102,7 @@
   const toastEl = $('#toast');
 
   let currentStage = 1;
+  let cropSession = null;
 
   /* ---------- TOAST ---------- */
   let toastTimer = null;
@@ -78,6 +111,313 @@
     toastEl.classList.add('show');
     clearTimeout(toastTimer);
     toastTimer = setTimeout(()=> toastEl.classList.remove('show'), 2200);
+  }
+
+  /* =========================================================
+     COIN FLIP
+     ========================================================= */
+
+  function normaliseProbability(value){
+    const n = parseInt(value, 10);
+    if(Number.isNaN(n)) return 50;
+    return Math.max(0, Math.min(100, n));
+  }
+
+  function applyCoinFace(face, image, fallback){
+    face.classList.toggle('has-image', !!image);
+    face.style.backgroundImage = image ? `url("${image}")` : '';
+    const label = face.querySelector('span');
+    if(label) label.textContent = fallback;
+  }
+
+  function renderCoin(){
+    coinState.headsProbability = normaliseProbability(coinState.headsProbability);
+    const tails = 100 - coinState.headsProbability;
+    headsProbability.value = coinState.headsProbability;
+    headsProbabilityLabel.textContent = `${coinState.headsProbability}%`;
+    tailsProbabilityLabel.textContent = `Tails ${tails}%`;
+    applyCoinFace(coinHeadsFace, coinState.headsImage, 'H');
+    applyCoinFace(coinTailsFace, coinState.tailsImage, 'T');
+    coinResult.textContent = coinState.lastResult ? coinState.lastResult : 'Ready';
+  }
+
+  function persistCoinDraft(){
+    if(!hasLocalStorage) return;
+    try{
+      window.localStorage.setItem(COIN_DRAFT_KEY, JSON.stringify(coinState));
+    } catch(err){ showToast('Coin image is too large to save'); }
+  }
+
+  function restoreCoinDraft(){
+    if(!hasLocalStorage){ renderCoin(); return; }
+    try{
+      const raw = window.localStorage.getItem(COIN_DRAFT_KEY);
+      if(raw){
+        const parsed = JSON.parse(raw);
+        coinState = {
+          headsImage: parsed.headsImage || '',
+          tailsImage: parsed.tailsImage || '',
+          headsProbability: normaliseProbability(parsed.headsProbability),
+          lastResult: parsed.lastResult || null
+        };
+      }
+    } catch(err){ /* corrupt coin draft: keep defaults */ }
+    renderCoin();
+  }
+
+  function openCoinPage(){
+    renderCoin();
+    renderCoinPresetList();
+    coinPage.classList.add('show');
+    coinPage.setAttribute('aria-hidden', 'false');
+  }
+
+  function closeCoinPage(){
+    coinPage.classList.remove('show');
+    coinPage.setAttribute('aria-hidden', 'true');
+  }
+
+  function clamp(value, min, max){
+    return Math.max(min, Math.min(max, value));
+  }
+
+  function imageToDataUrl(file){
+    return new Promise((resolve, reject)=>{
+      const reader = new FileReader();
+      reader.onload = ()=> resolve(String(reader.result || ''));
+      reader.onerror = ()=> reject(new Error('Could not read image'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function loadImage(src){
+    return new Promise((resolve, reject)=>{
+      const img = new Image();
+      img.onload = ()=> resolve(img);
+      img.onerror = ()=> reject(new Error('Could not decode image'));
+      img.src = src;
+    });
+  }
+
+  function getCropBounds(){
+    if(!cropSession) return { minX:0, maxX:0, minY:0, maxY:0 };
+    const size = cropCanvas.width;
+    const drawW = cropSession.baseWidth * cropSession.zoom;
+    const drawH = cropSession.baseHeight * cropSession.zoom;
+    return {
+      minX: Math.min(0, size - drawW),
+      maxX: Math.max(0, size - drawW),
+      minY: Math.min(0, size - drawH),
+      maxY: Math.max(0, size - drawH)
+    };
+  }
+
+  function clampCropOffset(){
+    if(!cropSession) return;
+    const bounds = getCropBounds();
+    cropSession.x = clamp(cropSession.x, bounds.minX, bounds.maxX);
+    cropSession.y = clamp(cropSession.y, bounds.minY, bounds.maxY);
+  }
+
+  function drawCropPreview(){
+    if(!cropSession) return;
+    const ctx = cropCanvas.getContext('2d');
+    const size = cropCanvas.width;
+    const drawW = cropSession.baseWidth * cropSession.zoom;
+    const drawH = cropSession.baseHeight * cropSession.zoom;
+    ctx.clearRect(0, 0, size, size);
+    ctx.fillStyle = '#080A0F';
+    ctx.fillRect(0, 0, size, size);
+    ctx.drawImage(cropSession.image, cropSession.x, cropSession.y, drawW, drawH);
+  }
+
+  async function openCropModal(file, side){
+    const dataUrl = await imageToDataUrl(file);
+    const image = await loadImage(dataUrl);
+    const size = cropCanvas.width;
+    const coverScale = Math.max(size / image.naturalWidth, size / image.naturalHeight);
+    const baseWidth = image.naturalWidth * coverScale;
+    const baseHeight = image.naturalHeight * coverScale;
+    cropSession = {
+      side,
+      image,
+      baseWidth,
+      baseHeight,
+      zoom: 1,
+      x: (size - baseWidth) / 2,
+      y: (size - baseHeight) / 2,
+      drag: null
+    };
+    cropZoom.value = '1';
+    cropModalTitle.textContent = `Crop ${side === 'heads' ? 'heads' : 'tails'} picture`;
+    clampCropOffset();
+    drawCropPreview();
+    cropModalOverlay.classList.add('show');
+  }
+
+  function closeCropModal(){
+    cropModalOverlay.classList.remove('show');
+    cropWorkspace.classList.remove('dragging');
+    cropSession = null;
+  }
+
+  function applyCrop(){
+    if(!cropSession) return;
+    const outputCanvas = document.createElement('canvas');
+    outputCanvas.width = 512;
+    outputCanvas.height = 512;
+    const outputCtx = outputCanvas.getContext('2d');
+    outputCtx.fillStyle = '#080A0F';
+    outputCtx.fillRect(0, 0, outputCanvas.width, outputCanvas.height);
+    outputCtx.drawImage(cropCanvas, 0, 0);
+    const cropped = outputCanvas.toDataURL('image/jpeg', 0.88);
+    if(cropSession.side === 'heads') coinState.headsImage = cropped;
+    else coinState.tailsImage = cropped;
+    coinState.lastResult = null;
+    coin3d.style.transform = cropSession.side === 'heads' ? 'rotateY(0deg) rotateX(0deg)' : 'rotateY(180deg) rotateX(0deg)';
+    renderCoin();
+    persistCoinDraft();
+    closeCropModal();
+  }
+
+  async function readImageFile(input, side){
+    const file = input.files && input.files[0];
+    if(!file) return;
+    try{
+      await openCropModal(file, side);
+    } catch(err){
+      showToast('This image could not be opened');
+    } finally {
+      input.value = '';
+    }
+  }
+
+  function flipCoin(){
+    if(coin3d.classList.contains('flipping')) return;
+    const isHeads = Math.random() * 100 < coinState.headsProbability;
+    const result = isHeads ? 'Heads' : 'Tails';
+    const startRotation = coinState.lastResult === 'Tails' ? 180 : 0;
+    const targetRotation = isHeads ? 0 : 180;
+    const targetDelta = (targetRotation - startRotation + 360) % 360;
+    const turns = 7 + Math.floor(Math.random() * 2);
+    const finalRotation = startRotation + (turns * 360) + targetDelta;
+    const totalTravel = finalRotation - startRotation;
+    const midRotation = startRotation + (totalTravel * 0.38);
+    const lateRotation = startRotation + (totalTravel * 0.72);
+    coinState.lastResult = result;
+
+    coinResult.textContent = 'Flipping...';
+    flipCoinBtn.disabled = true;
+    coin3d.classList.remove('flipping');
+    coin3d.style.transform = `rotateY(${startRotation}deg) rotateX(0deg)`;
+    coin3d.style.setProperty('--start-rotation', `${startRotation}deg`);
+    coin3d.style.setProperty('--mid-rotation', `${midRotation}deg`);
+    coin3d.style.setProperty('--late-rotation', `${lateRotation}deg`);
+    coin3d.style.setProperty('--final-rotation', `${finalRotation}deg`);
+    void coin3d.offsetWidth;
+    coin3d.classList.add('flipping');
+
+    window.setTimeout(()=>{
+      coin3d.classList.remove('flipping');
+      coin3d.style.transform = `rotateY(${finalRotation}deg) rotateX(0deg)`;
+      coinResult.textContent = result;
+      flipCoinBtn.disabled = false;
+      persistCoinDraft();
+    }, 1750);
+  }
+
+  function readCoinPresetsRaw(){
+    if(!hasLocalStorage) return [];
+    try{
+      const raw = window.localStorage.getItem(COIN_PRESETS_KEY);
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch(err){ return []; }
+  }
+
+  function writeCoinPresetsRaw(arr){
+    if(!hasLocalStorage) return false;
+    try{
+      window.localStorage.setItem(COIN_PRESETS_KEY, JSON.stringify(arr));
+      return true;
+    } catch(err){ return false; }
+  }
+
+  function listCoinPresets(){
+    return readCoinPresetsRaw().sort((a,b)=> (b.savedAt||0) - (a.savedAt||0));
+  }
+
+  function saveCoinPreset(name){
+    const data = {
+      id: 'coin' + Date.now(),
+      name,
+      savedAt: Date.now(),
+      headsImage: coinState.headsImage,
+      tailsImage: coinState.tailsImage,
+      headsProbability: coinState.headsProbability
+    };
+    const arr = readCoinPresetsRaw();
+    arr.push(data);
+    if(writeCoinPresetsRaw(arr)){
+      coinPresetNameInput.value = '';
+      renderCoinPresetList();
+      showToast('Coin preset saved');
+    } else {
+      showToast('Could not save coin preset');
+    }
+  }
+
+  function loadCoinPreset(id){
+    const preset = listCoinPresets().find(p=>p.id === id);
+    if(!preset) return;
+    coinState.headsImage = preset.headsImage || '';
+    coinState.tailsImage = preset.tailsImage || '';
+    coinState.headsProbability = normaliseProbability(preset.headsProbability);
+    coinState.lastResult = null;
+    coin3d.style.transform = 'rotateY(0deg) rotateX(0deg)';
+    renderCoin();
+    persistCoinDraft();
+    showToast(`Loaded "${preset.name}"`);
+  }
+
+  async function deleteCoinPreset(id){
+    const arr = readCoinPresetsRaw().filter(p=>p.id !== id);
+    writeCoinPresetsRaw(arr);
+    renderCoinPresetList();
+    showToast('Coin preset deleted');
+  }
+
+  function renderCoinPresetList(){
+    const presets = listCoinPresets();
+    coinPresetList.innerHTML = '';
+    presets.forEach(p=>{
+      const item = document.createElement('div');
+      item.className = 'coin-preset-item';
+      const date = new Date(p.savedAt);
+      const dateStr = date.toLocaleDateString(undefined, {month:'short', day:'numeric'});
+      const previewStyle = p.headsImage ? `style="background-image:url('${p.headsImage}')"` : '';
+      item.innerHTML = `
+        <div class="coin-preset-preview">
+          <span class="coin-mini" ${previewStyle}></span>
+          <div class="coin-preset-copy">
+            <span class="coin-preset-name">${escapeHtml(p.name)}</span>
+            <span class="coin-preset-meta">Heads ${normaliseProbability(p.headsProbability)}% &middot; ${dateStr}</span>
+          </div>
+        </div>
+        <div class="coin-preset-actions">
+          <button class="preset-load-btn" type="button">Use</button>
+          <button class="preset-del-btn" type="button" aria-label="Delete coin preset">
+            <svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0l-1 14a2 2 0 01-2 2H7a2 2 0 01-2-2L4 6"/></svg>
+          </button>
+        </div>
+      `;
+      item.querySelector('.preset-load-btn').addEventListener('click', ()=> loadCoinPreset(p.id));
+      item.querySelector('.preset-del-btn').addEventListener('click', async ()=>{
+        const ok = await confirmDialog('Delete this coin preset?', `"${p.name}" will be removed for good.`);
+        if(ok) deleteCoinPreset(p.id);
+      });
+      coinPresetList.appendChild(item);
+    });
   }
 
   /* ---------- CONFIRM MODAL (promise-based) ---------- */
@@ -588,6 +928,8 @@
 
   const DRAFT_KEY = 'fairteams:draft-state';
   const PRESETS_KEY = 'fairteams:presets';
+  const COIN_DRAFT_KEY = 'fairteams:coin-draft';
+  const COIN_PRESETS_KEY = 'fairteams:coin-presets';
   const hasLocalStorage = (function(){
     try{
       const k = '__ft_test__';
@@ -741,6 +1083,72 @@
   closeDrawerBtn.addEventListener('click', closeDrawer);
   drawerOverlay.addEventListener('click', closeDrawer);
 
+  /* ----- coin page controls ----- */
+  coinFab.addEventListener('click', openCoinPage);
+  coinBackBtn.addEventListener('click', closeCoinPage);
+  flipCoinBtn.addEventListener('click', flipCoin);
+  headsImageInput.addEventListener('change', ()=> readImageFile(headsImageInput, 'heads'));
+  tailsImageInput.addEventListener('change', ()=> readImageFile(tailsImageInput, 'tails'));
+  cropZoom.addEventListener('input', ()=>{
+    if(!cropSession) return;
+    const prevZoom = cropSession.zoom;
+    const nextZoom = parseFloat(cropZoom.value) || 1;
+    const center = cropCanvas.width / 2;
+    cropSession.x = center - ((center - cropSession.x) * nextZoom / prevZoom);
+    cropSession.y = center - ((center - cropSession.y) * nextZoom / prevZoom);
+    cropSession.zoom = nextZoom;
+    clampCropOffset();
+    drawCropPreview();
+  });
+  cropWorkspace.addEventListener('pointerdown', (e)=>{
+    if(!cropSession) return;
+    e.preventDefault();
+    cropWorkspace.classList.add('dragging');
+    cropWorkspace.setPointerCapture(e.pointerId);
+    cropSession.drag = {
+      pointerId: e.pointerId,
+      startX: e.clientX,
+      startY: e.clientY,
+      originX: cropSession.x,
+      originY: cropSession.y
+    };
+  });
+  cropWorkspace.addEventListener('pointermove', (e)=>{
+    if(!cropSession || !cropSession.drag || cropSession.drag.pointerId !== e.pointerId) return;
+    const rect = cropWorkspace.getBoundingClientRect();
+    const scale = cropCanvas.width / rect.width;
+    cropSession.x = cropSession.drag.originX + ((e.clientX - cropSession.drag.startX) * scale);
+    cropSession.y = cropSession.drag.originY + ((e.clientY - cropSession.drag.startY) * scale);
+    clampCropOffset();
+    drawCropPreview();
+  });
+  function endCropDrag(e){
+    if(!cropSession || !cropSession.drag || cropSession.drag.pointerId !== e.pointerId) return;
+    cropWorkspace.releasePointerCapture(e.pointerId);
+    cropWorkspace.classList.remove('dragging');
+    cropSession.drag = null;
+  }
+  cropWorkspace.addEventListener('pointerup', endCropDrag);
+  cropWorkspace.addEventListener('pointercancel', endCropDrag);
+  cancelCropBtn.addEventListener('click', closeCropModal);
+  cropModalOverlay.addEventListener('click', (e)=>{
+    if(e.target === cropModalOverlay) closeCropModal();
+  });
+  applyCropBtn.addEventListener('click', applyCrop);
+  headsProbability.addEventListener('input', ()=>{
+    coinState.headsProbability = normaliseProbability(headsProbability.value);
+    renderCoin();
+    persistCoinDraft();
+  });
+  saveCoinPresetBtn.addEventListener('click', ()=>{
+    const name = coinPresetNameInput.value.trim();
+    if(!name){ coinPresetNameInput.focus(); return; }
+    saveCoinPreset(name);
+  });
+  coinPresetNameInput.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter'){ e.preventDefault(); saveCoinPresetBtn.click(); }
+  });
+
   /* ----- save modal ----- */
   function openSaveModal(){
     presetNameInput.value = '';
@@ -773,6 +1181,7 @@
      ========================================================= */
   async function init(){
     await restoreDraft();
+    restoreCoinDraft();
     goToStage(1, {skipGenerate:true, force:true});
   }
 
